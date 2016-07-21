@@ -16,5 +16,6 @@ class Post(models.Model):
     
     class Meta:
     	ordering = ('-publish',)
-	def __str__(self):
+    def __str__(self):
     	return self.title
+
