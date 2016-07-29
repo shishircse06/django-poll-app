@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Post, Comment
 from django.views.generic import ListView
 from .forms import EmailPostForm, CommentForm
+from taggit.models import Tag
 
 class PostListView(ListView):
 	queryset = Post.published.all()
@@ -12,8 +13,12 @@ class PostListView(ListView):
 	template_name = 'blog/post/list.html'	
 
 # Create your views here.
-def post_list(request):
+def post_list(request, tag_slug=None):
     object_list = Post.published.all()
+    tag = None
+    if tag_slug:
+    	tag = get_object_or_404(Tag, slug=tag_slug)
+    	object_list = object_list.filter(tags__in=[tag])
     paginator = Paginator(object_list, 2) # Show 25 contacts per page
 
     page = request.GET.get('page')
@@ -26,7 +31,7 @@ def post_list(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         posts = paginator.page(paginator.num_pages)
 
-    return render(request, 'blog/post/list.html', {'page' : page,'posts': posts})
+    return render(request, 'blog/post/list.html', {'page' : page,'posts': posts, 'tag': tag})
 
 	
 
